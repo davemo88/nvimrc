@@ -15,9 +15,14 @@ Plug 'hrsh7th/cmp-cmdline'
 Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
 Plug 'simrat39/rust-tools.nvim'
+Plug 'mfussenegger/nvim-dap'
+Plug 'mfussenegger/nvim-dap-python'
+Plug 'rcarriga/nvim-dap-ui'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 call plug#end()
 
 lua require'lspconfig'.rust_analyzer.setup{}
+lua require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
 
 syntax enable
 syntax on
@@ -68,18 +73,21 @@ set shortmess+=c
 " See https://github.com/simrat39/rust-tools.nvim#configuration
 lua <<EOF
 local nvim_lsp = require'lspconfig'
+local rt = require("rust-tools")
+
+require'lspconfig'.rust_analyzer.setup({
+    settings = {
+        ["rust-analyzer"] = {
+	    cargo = {
+		unsetTest = {
+		    "core", "ed25519-dalek"
+		}
+	    }
+        }
+    }
+})
 
 local opts = {
-    tools = { -- rust-tools options
-        autoSetHints = true,
-        hover_with_actions = true,
-        inlay_hints = {
-            show_parameter_hints = false,
-            parameter_hints_prefix = "",
-            other_hints_prefix = "",
-        },
-    },
-
     -- all the opts to send to nvim-lspconfig
     -- these override the defaults set by rust-tools.nvim
     -- see https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#rust_analyzer
@@ -95,7 +103,13 @@ local opts = {
                     command = "clippy"
                 },
             }
-        }
+        },
+	on_attach = function(_, bufnr)
+	    -- Hover actions
+      	    vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+      	    -- Code action groups
+      	    vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+     	end,
     },
 }
 
@@ -170,3 +184,5 @@ set signcolumn=yes
 "autocmd BufWritePre *.rs lua vim.lsp.buf.formatting_sync(nil, 200)
 
 " let g:rustfmt_autosave = 1
+set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+set grepformat=%f:%l:%c:%m
