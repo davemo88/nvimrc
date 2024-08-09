@@ -1,4 +1,5 @@
 call plug#begin()
+Plug 'nvim-lua/plenary.nvim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'rust-lang/rust.vim'
@@ -18,8 +19,16 @@ Plug 'simrat39/rust-tools.nvim'
 Plug 'mfussenegger/nvim-dap'
 Plug 'mfussenegger/nvim-dap-python'
 Plug 'rcarriga/nvim-dap-ui'
+Plug 'jackMort/ChatGPT.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'MunifTanjim/nui.nvim',
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'othree/html5.vim'
+Plug 'pangloss/vim-javascript'
+Plug 'evanleck/vim-svelte', {'branch': 'main'}
 call plug#end()
+
+lua require'lspconfig'.tsserver.setup {}
 
 lua require'lspconfig'.rust_analyzer.setup{}
 lua require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
@@ -34,6 +43,12 @@ function! SynStack()
   endif
   echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
 endfunc
+	
+set expandtab
+set shiftwidth=4
+set tabstop=4
+autocmd FileType svelte set shiftwidth=2
+autocmd FileType svelte set tabstop=2
 
 let mapleader = ","
 nnoremap <silent> <leader>f :FZF<cr>
