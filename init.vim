@@ -28,7 +28,7 @@ Plug 'pangloss/vim-javascript'
 Plug 'evanleck/vim-svelte', {'branch': 'main'}
 call plug#end()
 
-lua require'lspconfig'.tsserver.setup {}
+lua require'lspconfig'.ts_ls.setup {}
 
 lua require'lspconfig'.rust_analyzer.setup{}
 lua require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
